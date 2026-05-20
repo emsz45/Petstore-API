@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Crear Pedido</title>
+    <link rel="icon" type="image/x-icon" href="pets.png">
+
+  <!-- Fuente correcta (sin &amp;) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      color-scheme: light;
+      --bg: #f7efe5;
+      --bg-card: #ffffff;
+      --bg-header: #e6d7c3;
+      --text: #5a4632;
+      --text-muted: #7d6a53;
+      --brand: #b99672;
+      --brand-dark: #5a4632;
+      --border: #e5e7eb;
+
+      --success-bg: #e6f6ec;
+      --success-fg: #0a7d34;
+      --warn-bg: #fff7e6;
+      --warn-fg: #a15c00;
+      --danger-bg: #fdecec;
+      --danger-fg: #a10d11;
+
+      --chip-bg: #efe7de;
+      --card-muted: #f4eee7;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:"Poppins",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.5;
+            /* ✅ Fondo con tu imagen */
+  background-image: url("https://www.shutterstock.com/image-vector/dog-paw-bone-seamless-vector-600nw-2465714911.jpg");
+  background-repeat: repeat;       /* 🔁 se repite */
+  background-size: auto;           /* mantiene el tamaño real */
+  background-position: top left;   /* empieza desde la esquina */
+    }
+
+    /* ===== HEADER (marca → inicio, único botón → inventario) ===== */
+    .header{
+      position:sticky; top:0;
+      background:var(--bg-header);
+      border-bottom:1px solid var(--border);
+      box-shadow:0 2px 8px rgba(0,0,0,.08);
+      padding:.5rem 0;
+      z-index:10;
+      backdrop-filter:saturate(180%) blur(6px);
+    }
+    .nav{
+      max-width:1200px; margin:0 auto;
+      padding:.9rem 1rem;
+      display:grid; grid-template-columns:1fr auto;
+      align-items:center; gap:.75rem;
+    }
+    .brand a{
+      text-decoration:none; font-size:1.2rem; font-weight:700; color:var(--brand-dark);
+    }
+    .brand a:hover{ text-decoration:underline; }
+    .links{ display:flex; gap:.5rem; flex-wrap:wrap; }
+    .links a{
+      padding:.55rem .8rem; border-radius:.6rem; font-weight:600; text-decoration:none;
+      box-shadow:0 1px 0 rgba(0,0,0,.03);
+      background:var(--brand); color:white; border:1px solid transparent; transition:.15s;
+    }
+    .links a:hover{ transform:translateY(-1px); box-shadow:0 6px 14px rgba(0,0,0,.08); }
+
+    /* ===== Layout ===== */
+    main{ padding:1.25rem; }
+    @media (min-width: 860px){ main{ padding:2rem; } }
+    .card{
+      max-width:900px; margin:0 auto;
+      background:var(--bg-card); border:1px solid var(--border);
+      border-radius:14px; padding:1.25rem; box-shadow:0 8px 20px rgba(0,0,0,.06);
+    }
+
+    h1{ margin:0 0 .35rem; font-size:1.6rem; }
+    .sub{ color:var(--text-muted); margin:.25rem 0 1rem; }
+
+    fieldset{
+      border:1px solid var(--border); border-radius:12px; padding:1rem; background:#fff; margin-bottom:1rem;
+    }
+    legend{ font-weight:700; color:var(--brand-dark); padding:0 .4rem; }
+    label{ display:block; font-weight:600; margin-bottom:.35rem; }
+
+    .row{ display:grid; gap:1rem; }
+    @media(min-width:720px){ .row{ grid-template-columns:1fr 1fr; } }
+    .help{ font-size:.85rem; color:var(--text-muted); }
+
+    input, select{
+      width:100%; padding:.65rem .7rem; border:1px solid var(--border); border-radius:.6rem;
+      background:white; color:var(--text); font-size:1rem; transition:.15s;
+    }
+    input:focus, select:focus{
+      border-color:#d8c6b1; box-shadow:0 0 0 3px rgba(185,150,114,.25);
+    }
+
+    .actions{ display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; }
+
+    .btn{
+      padding:.7rem 1.05rem; border:0; border-radius:.7rem;
+      background:var(--brand); color:white; font-weight:700; cursor:pointer;
+      box-shadow:0 4px 10px rgba(185,150,114,.25); transition:.15s;
+    }
+    .btn:hover{ transform:translateY(-1px); box-shadow:0 8px 18px rgba(185,150,114,.32); }
+    .btn.secondary{ background:#6aa686; }
+    .btn.ghost{ background:transparent; border:1px solid #d8c6b1; color:var(--brand-dark); }
+
+    .bar{
+      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;
+      padding:.65rem .8rem; border:1px solid var(--border); background:var(--card-muted);
+      border-radius:12px; margin:.75rem 0;
+    }
+    .ok{ color:var(--success-fg); font-weight:700; }
+    .err{ color:var(--danger-fg); font-weight:700; }
+    .note{ color:var(--text-muted); font-size:.9rem; }
+
+    .result-card{
+      border:1px solid var(--border); border-radius:12px; background:white;
+      padding:1rem; box-shadow:0 4px 12px rgba(0,0,0,.04);
+    }
+    .kv{ display:grid; grid-template-columns:120px 1fr; gap:.25rem .6rem; }
+
+    footer.site{
+      max-width:900px; margin:1.25rem auto 0;
+      background:var(--bg-header); border-top:1px solid var(--border);
+      padding:1rem; border-radius:12px; text-align:center;
+    }
+
+    /* Modal */
+    .modal{
+      position:fixed; inset:0; display:none;
+      background:rgba(0,0,0,.5);
+      align-items:center; justify-content:center; padding:1rem; z-index:20;
+    }
+    .modal.open{ display:flex; }
+    .modal-box{
+      background:white; border-radius:14px; width:min(960px,95vw); max-height:90vh; overflow:auto;
+      border:1px solid var(--border); box-shadow:0 8px 30px rgba(0,0,0,.2);
+    }
+    .modal-head{
+      display:flex; justify-content:space-between; align-items:center; padding:.8rem 1rem; border-bottom:1px solid var(--border);
+    }
+    .modal-body pre{
+      margin:0; padding:1rem; background:#151212; color:#efeae4;
+    }
+    .close-x{
+      background:transparent; border:0; font-size:1.2rem; color:var(--brand-dark); cursor:pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <nav class="nav">
+    <!-- Marca → inicio -->
+    <div class="brand">
+      <a href="main-index.html">Tienda de Mascotas</a>
+      <img src="icon.png" alt="Icono tienda"
+         style="width:38px; height:38px; object-fit:contain;">
+    </div>
+
+    <!-- Único botón: Inventario -->
+    <div class="links">
+      <a href="./inventario.html">Inventario</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <div class="card">
+    <h1>Crear Pedido📝</h1>
+    <p class="sub">Completa los datos del pedido y envía la solicitud.</p>
+
+    <!-- Formulario -->
+    <form id="orderForm">
+      <fieldset>
+        <legend>Datos del pedido</legend>
+
+        <div class="row">
+          <div>
+            <label for="id">Identificador del Pedido (opcional)</label>
+            <input id="id" name="id" type="number" min="1" placeholder="ej. 10" />
+            <div class="help">Si lo omites, la API puede asignar uno.</div>
+          </div>
+
+          <div>
+            <label for="petId">Identificador de Mascota *</label>
+            <input id="petId" name="petId" type="number" min="1" required placeholder="ej. 198772" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="quantity">Cantidad *</label>
+            <input id="quantity" name="quantity" type="number" min="1" required placeholder="ej. 1" />
+          </div>
+          <div>
+            <label for="shipDate">Fecha de envío (ISO)</label>
+            <input id="shipDate" name="shipDate" type="datetime-local" step="1" />
+            <div class="help">Se convertirá a UTC ISO.</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="status">Estado</label>
+            <select id="status" name="status">
+              <option value="">(sin especificar)</option>
+              <option value="placed">placed</option>
+              <option value="approved">approved</option>
+              <option value="delivered">delivered</option>
+            </select>
+          </div>
+          <div>
+            <label for="complete">Pedido completo</label>
+            <select id="complete" name="complete">
+              <option value="false">false</option>
+              <option value="true">true</option>
+            </select>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="actions">
+        <button type="button" id="previewBtn" class="btn secondary">Vista previa JSON</button>
+        <button type="submit" id="submitBtn" class="btn">Crear pedido</button>
+        <span id="info" class="note"></span>
+      </div>
+    </form>
+
+    <!-- Barra de estado -->
+    <div id="bar" class="bar" style="display:none">
+      <div id="httpStatus"></div>
+      <div id="lastUrl" class="note"></div>
+    </div>
+
+    <!-- Resultado -->
+    <div id="resultCard" class="result-card" style="display:none">
+      <h3>Pedido creado</h3>
+      <div class="kv" id="kv"></div>
+      <div class="actions" style="margin-top:.6rem">
+        <button type="button" class="btn ghost" id="viewJsonBtn">Ver JSON</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site">
+    <small>© 2026 Tienda de Mascotas. Todos los derechos reservados.</small>
+  </footer>
+</main>
+
+<!-- MODAL -->
+<div id="modal" class="modal" role="dialog" aria-modal="true" aria-label="Detalle JSON">
+  <div class="modal-box">
+    <div class="modal-head">
+      <strong id="modalTitle">JSON</strong>
+      <button id="modalClose" class="close-x" aria-label="Cerrar">✕</button>
+    </div>
+    <div id="modalBody" class="modal-body"></div>
+  </div>
+</div>
+
+<script>
+  // ===== Config y utilidades =====
+  const API = "https://petstore3.swagger.io/api/v3/store/order";
+  const $ = (id) => document.getElementById(id);
+
+  const form = $("orderForm");
+  const previewBtn = $("previewBtn");
+  const submitBtn = $("submitBtn");
+  const info = $("info");
+  const bar = $("bar");
+  const httpStatus = $("httpStatus");
+  const lastUrl = $("lastUrl");
+
+  const resultCard = $("resultCard");
+  const kv = $("kv");
+  const viewJsonBtn = $("viewJsonBtn");
+
+  const modal = $("modal");
+  const modalTitle = $("modalTitle");
+  const modalBody = $("modalBody");
+  $("modalClose").addEventListener("click", closeModal);
+  modal.addEventListener("click", (e)=>{ if(e.target===modal) closeModal(); });
+  document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeModal(); });
+
+  function closeModal(){ modal.classList.remove("open"); modalBody.innerHTML = ""; }
+  function openModalJSON(obj, title="JSON"){
+    modalTitle.textContent = title;
+    const pretty = JSON.stringify(obj, null, 2);
+    modalBody.innerHTML = '<pre>'+escapeHtml(pretty)+'</pre>';
+    modal.classList.add("open");
+  }
+  function escapeHtml(v){
+    return String(v ?? "")
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  }
+
+  // Inicializa shipDate con ahora (local)
+  (function initNow(){
+    const el = $("shipDate");
+    if (!el) return;
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2,"0");
+    // yyyy-MM-ddTHH:mm:ss
+    const local = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    el.value = local;
+  })();
+
+  function toIsoUtcFromLocalInput(dtLocal){
+    if (!dtLocal) return undefined;
+    const d = new Date(dtLocal); // interpreta local time
+    if (isNaN(d.getTime())) return undefined;
+    return d.toISOString();      // a UTC ISO
+  }
+
+  function buildPayload(){
+    const idVal = $("id").value.trim();
+    const petIdVal = Number($("petId").value);
+    const qtyVal = Number($("quantity").value);
+    const shipValLocal = $("shipDate").value;
+    const statusVal = $("status").value;
+    const completeVal = $("complete").value === "true";
+
+    const payload = {
+      petId: petIdVal,
+      quantity: qtyVal,
+      ...(idVal ? { id: Number(idVal) } : {}),
+      ...(shipValLocal ? { shipDate: toIsoUtcFromLocalInput(shipValLocal) } : {}),
+      ...(statusVal ? { status: statusVal } : {}),
+      complete: completeVal
+    };
+    return payload;
+  }
+
+  function validatePayload(p){
+    if (!Number.isFinite(p.petId) || p.petId <= 0) return "Pet ID debe ser un entero positivo.";
+    if (!Number.isFinite(p.quantity) || p.quantity <= 0) return "Cantidad debe ser un entero positivo.";
+    if (p.shipDate && isNaN(new Date(p.shipDate).getTime())) return "Fecha de envío inválida.";
+    return null;
+  }
+
+  function setBar(ok, statusCode, url){
+    bar.style.display = "flex";
+    httpStatus.innerHTML = ok ? `<span class="ok">HTTP ${statusCode}</span>` : `<span class="err">HTTP ${statusCode}</span>`;
+    lastUrl.textContent = url || API;
+  }
+
+  function renderResultCard(order){
+    resultCard.style.display = "block";
+    const rows = [
+      ["Order ID", order.id],
+      ["Pet ID", order.petId],
+      ["Cantidad", order.quantity],
+      ["Estado", order.status ?? "—"],
+      ["Completo", String(order.complete)],
+      ["shipDate", order.shipDate ?? "—"],
+    ];
+    kv.innerHTML = rows.map(([k, v]) =>
+      `<div>${escapeHtml(k)}</div><div>${escapeHtml(String(v))}</div>`
+    ).join("");
+    viewJsonBtn.onclick = () => openModalJSON(order, `Pedido #${order.id ?? ""}`);
+  }
+
+  previewBtn.addEventListener("click", ()=>{
+    const payload = buildPayload();
+    const msg = validatePayload(payload);
+    if (msg){ alert(msg); return; }
+    openModalJSON(payload, "Vista previa JSON (POST /store/order)");
+  });
+
+  form.addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    info.textContent = "";
+    resultCard.style.display = "none";
+
+    const payload = buildPayload();
+    const msg = validatePayload(payload);
+    if (msg){ alert(msg); return; }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Enviando…";
+    setBar(true, "—", API);
+
+    try{
+      const res = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const text = await res.text();
+      let body; try{ body = JSON.parse(text); }catch{ body = text; }
+
+      setBar(res.ok, res.status, API);
+
+      if (res.ok && body && typeof body === "object"){
+        info.textContent = "Pedido creado correctamente ✔";
+        renderResultCard(body);
+      } else {
+        info.textContent = "La API respondió con un error.";
+        openModalJSON(body, `Error HTTP ${res.status}`);
+      }
+    }catch(err){
+      setBar(false, "error", API);
+      info.textContent = "Falló la solicitud.";
+      openModalJSON(String(err), "Excepción");
+    }finally{
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Crear pedido";
+    }
+  });
+</script>
+</body>
+</html>

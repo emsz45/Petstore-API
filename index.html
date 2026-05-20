@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inicio — Listado de Mascotas (Petstore v3)</title>
+   <link rel="icon" type="image/x-icon" href="pets.png">
+
+  <!-- Fuente -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ------------------------------
+       PALETA DE COLORES
+    --------------------------------*/
+    :root {
+      color-scheme: light;
+      --bg: #f7efe5;
+      --bg-card: #ffffff;
+      --bg-header: #e6d7c3;
+      --text: #5a4632;
+      --text-muted: #7d6a53;
+      --brand: #b99672;
+      --brand-dark: #5a4632;
+      --border: #e5e7eb;
+      --success-bg: #e6f6ec;
+      --success-fg: #0a7d34;
+      --warn-bg: #fff7e6;
+      --warn-fg: #a15c00;
+      --danger-bg: #fdecec;
+      --danger-fg: #a10d11;
+      --tag-bg: #efe7de;
+      --tag-fg: #5a4632;
+      --thead-bg: #faf5ef;
+      --chip-bg: #efe7de;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+        /* ✅ Fondo con tu imagen */
+  background-image: url("https://www.shutterstock.com/image-vector/dog-paw-bone-seamless-vector-600nw-2465714911.jpg");
+  background-repeat: repeat;       /* 🔁 se repite */
+  background-size: auto;           /* mantiene el tamaño real */
+  background-position: top left;   /* empieza desde la esquina */
+    }
+
+    /* Header */
+    .header {
+      position: sticky; top: 0; z-index: 10;
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      padding: .5rem 0;
+    }
+
+    .nav {
+      max-width: 1200px; margin: 0 auto;
+      padding: .9rem 1rem;
+      display: grid; grid-template-columns: 1fr auto; gap: .75rem;
+      align-items: center;
+    }
+
+    .brand a {
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 1.2rem;
+      color: var(--brand-dark);
+    }
+    .brand a:hover { text-decoration: underline; }
+
+    /* Links header */
+    .nav a {
+      text-decoration: none;
+      padding: .55rem .8rem;
+      border-radius: .6rem;
+      font-weight: 600;
+      box-shadow: 0 1px 0 rgba(0,0,0,.03);
+      border: 1px solid transparent;
+      transition: .15s;
+    }
+    .nav a:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(0,0,0,.08);
+    }
+
+    .cta { background: var(--brand); color:white; }
+    .success { background:#6aa686; color:white; }
+    .warn { background:#d9b16f; color:#2b1d0e; }
+    .danger { background:#b86666; color:white; }
+    .ghost { background: transparent; color: var(--brand-dark); border-color:#d8c6b1;}
+
+    /* Main */
+    main { padding: 1.5rem; }
+    .card {
+      max-width: 1200px; margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.06);
+      padding: 1.5rem;
+    }
+
+    h1 { margin: 0 0 .5rem; }
+    .sub { color:var(--text-muted); margin:.3rem 0 1rem; }
+
+    /* Toolbar */
+    .toolbar {
+      display:flex; flex-wrap:wrap; gap:.75rem; align-items:center;
+      background:white; border:1px solid var(--border);
+      border-radius:12px; padding:.75rem; margin-bottom:1rem;
+    }
+
+    .toolbar input[type="text"],
+    .toolbar input[type="number"] {
+      padding:.55rem .65rem;
+      border:1px solid var(--border);
+      border-radius:.5rem;
+      background:white;
+      color:var(--text);
+    }
+
+    .toolbar label {
+      display:inline-flex; align-items:center;
+      gap:.4rem; padding:.25rem .4rem;
+      background:var(--chip-bg);
+      border-radius:.5rem;
+    }
+
+    .btn {
+      padding:.6rem .95rem;
+      background:var(--brand); color:white;
+      border:0; border-radius:.6rem;
+      cursor:pointer;
+      font-weight:600;
+      box-shadow:0 4px 10px rgba(185,150,114,.25);
+      transition:.15s;
+    }
+
+    /* Table */
+    .table-wrap {
+      overflow:auto; max-height:70vh;
+      border:1px solid var(--border);
+      border-radius:12px; background:white;
+    }
+    table { width:100%; border-collapse:collapse; }
+    th,td { padding:.7rem; border-bottom:1px solid var(--border); }
+
+    th { background:var(--thead-bg); position:sticky; top:0; }
+
+    .tag { background:var(--tag-bg); padding:.2rem .5rem;
+           border-radius:.45rem; color:var(--tag-fg); margin-right:.3rem;}
+
+    .pill {
+      display:inline-block; padding:.2rem .55rem;
+      border-radius:999px; font-weight:700;
+    }
+    .available { background:var(--success-bg); color:var(--success-fg);}
+    .pending   { background:var(--warn-bg); color:var(--warn-fg);}
+    .sold      { background:var(--danger-bg); color:var(--danger-fg); }
+
+    .thumb { width:56px; height:56px; object-fit:cover; border-radius:.5rem; border:1px solid var(--border); }
+
+    footer.site {
+      margin-top: 2rem; padding: 1rem;
+      background: var(--bg-header); text-align:center;
+      border-top:1px solid var(--border);
+    }
+    /* ===========================================================
+   HEADER RESPONSIVE — PERFECTO PARA MÓVIL, SURFACE Y TABLET
+   =========================================================== */
+
+/* Estructura móvil y pequeños (< 860px) */
+@media (max-width: 860px) {
+
+  .nav {
+    grid-template-columns: 1fr;   /* Marca arriba */
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  /* Contenedor de botones */
+  .links {
+    display: flex;
+    flex-wrap: wrap;              /* ✅ Permite saltar línea */
+    justify-content: center;      /* ✅ Centrado bonito */
+    gap: 0.5rem 0.75rem;          /* ✅ Espaciado horizontal y vertical */
+    padding: 0.2rem 0;
+  }
+
+  /* Cada botón */
+ .links a {
+  flex: 0 1 auto;
+  min-width: 180px;
+}
+}
+
+/* Móviles muy pequeños (< 460px) */
+@media (max-width: 460px) {
+
+  .links a {
+    flex: 1 1 100%;               /* ✅ Un botón por fila */
+    font-size: 0.9rem;
+    padding: 0.55rem 0.7rem;
+  }
+
+  .brand a {
+    font-size: 1.1rem;
+  }
+}
+
+/* Superficies intermedias (860px – 1024px) */
+@media (min-width: 860px) and (max-width: 1024px) {
+
+  .links {
+    flex-wrap: wrap;
+    justify-content: flex-end;    /* ✅ Ordenado a la derecha pero con saltos */
+    gap: 0.6rem;
+  }
+
+  .links a {
+    flex: 0 1 auto;               /* ✅ Se acomodan sin apretarse */
+  }
+}
+/* Barra de búsqueda más larga */
+#qAll {
+  flex: 1 1 350px; /* 🔥 se expande hasta 350px mínimo */
+  max-width: 480px; /* 🔥 ancho máximo bonito */
+}
+/* ✅ Botón único azul: "Acciones" */
+.links .acciones{
+  background:#0d6efd;
+  color:#fff;
+  border:1px solid transparent;
+}
+
+.links .acciones:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.10);
+  opacity: .95;
+}
+  </style>
+</head>
+
+<body>
+
+  <header class="header">
+    <nav class="nav">
+      <div class="brand">
+        <a href="./main-index.html">Tienda de Mascotas</a>
+        <img src="icon.png" alt="Icono tienda"
+         style="width:38px; height:38px; object-fit:contain;">        
+      </div>
+
+     <div class="links">
+  <a class="acciones" href="./acciones.html">Acciones</a>
+</div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="card">
+
+      <h1>Listado de Mascotas</h1>
+      <div class="sub">Fuente: Swagger Petstore v3</div>
+
+      <div class="toolbar">
+        <button id="refreshBtn" class="btn">Actualizar lista</button>
+
+       <input id="qAll" type="text" placeholder="Buscar nombre, ID, categoría o etiqueta…">
+
+        
+        <label><input type="checkbox" class="st" value="available" checked> available</label>
+        <label><input type="checkbox" class="st" value="pending" checked> pending</label>
+        <label><input type="checkbox" class="st" value="sold" checked> sold</label>
+
+        <span id="count" class="count"></span>
+      </div>
+
+      <div id="error" class="error" role="alert" style="display:none"></div>
+
+      <div class="table-wrap">
+        <table id="petsTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Categoría</th>
+              <th>Nombre</th>
+              <th>Imagen</th>
+              <th>Tags</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="6" class="muted">Cargando…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer class="site">
+      <small>© 2026 Tienda de Mascotas. Todos los derechos reservados.</small>
+    </footer>
+  </main>
+
+<script>
+var BASE = "https://petstore3.swagger.io/api/v3";
+
+function byId(id) {
+  return document.getElementById(id);
+}
+
+function qsAll(sel) {
+  return Array.prototype.slice.call(document.querySelectorAll(sel));
+}
+
+// Para el filtro en vivo
+window._lastPets = [];
+
+// Deduplicar por id
+function dedupeById(pets) {
+  var map = new Map();
+  (pets || []).forEach(function (p) {
+    if (p && typeof p === "object" && p.id != null) {
+      map.set(p.id, p);
+    }
+  });
+  return Array.from(map.values());
+}
+
+// Normalizar texto (sin \p{Diacritic})
+function normalizeText(s) {
+  var str = (s == null ? "" : String(s)).toLowerCase();
+  try {
+    // NFD + quitar marcas combinadas
+    str = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  } catch (e) {
+    // si normalize no existe, no hacemos nada
+  }
+  return str;
+}
+
+// Escape HTML básico
+function escHtml(v) {
+  return String(v == null ? "" : v)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// Primera URL válida http/https en photoUrls
+function firstValidPhotoUrl(pet) {
+  var urls = (pet && Array.isArray(pet.photoUrls)) ? pet.photoUrls : [];
+  for (var i = 0; i < urls.length; i++) {
+    var u = urls[i];
+    if (typeof u === "string") {
+      var s = u.trim();
+      if (/^https?:\/\//i.test(s)) return s;
+    }
+  }
+  return null;
+}
+
+function renderPets(pets) {
+  var qAll = normalizeText(byId("qAll").value);
+  var safePets = Array.isArray(pets) ? pets : [];
+
+  var filtered = safePets.filter(function (p) {
+    if (!qAll) return true;
+
+    var name = normalizeText(p && p.name);
+    var id = String(p && p.id != null ? p.id : "");
+    var cat = normalizeText(p && p.category && p.category.name ? p.category.name : "");
+    var tags = "";
+
+    if (p && Array.isArray(p.tags)) {
+      tags = p.tags.map(function (t) {
+        return normalizeText(t && t.name ? t.name : "");
+      }).join(" ");
+    }
+
+    return (
+      name.indexOf(qAll) !== -1 ||
+      id.indexOf(qAll) !== -1 ||
+      cat.indexOf(qAll) !== -1 ||
+      tags.indexOf(qAll) !== -1
+    );
+  });
+
+  var tbody = byId("tbody");
+  tbody.innerHTML = "";
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="muted">Sin resultados</td></tr>';
+    byId("count").textContent = "Encontrado: 0";
+    return;
+  }
+
+  for (var j = 0; j < filtered.length; j++) {
+    var p = filtered[j];
+
+    var category = (p && p.category && p.category.name) ? p.category.name : "—";
+
+    // ✅ Imagen (columna Imagen)
+    var photo = firstValidPhotoUrl(p);
+    var thumb = "—";
+    if (photo) {
+      thumb =
+  '<img class="thumb" src="' + escHtml(photo) + '" alt="Foto" ' +
+    'onerror="this.style.display=\'none\'; this.outerHTML=\'—\';" />';
+    }
+
+    // ✅ Tags (columna Tags)
+    var tagsHtml = "—";
+    if (p && Array.isArray(p.tags) && p.tags.length) {
+      tagsHtml = p.tags.map(function (t) {
+        return '<span class="tag">' + escHtml(t && t.name ? t.name : "") + "</span>";
+      }).join("");
+    }
+
+    var st = normalizeText(p && p.status ? p.status : "");
+    var statusClass = (st === "available") ? "available" : (st === "pending") ? "pending" : "sold";
+    var statusText = st || "—";
+
+    var row = document.createElement("tr");
+    row.innerHTML =
+      "<td>" + escHtml(p && p.id != null ? p.id : "—") + "</td>" +
+      "<td>" + escHtml(category) + "</td>" +
+      "<td>" + escHtml(p && p.name ? p.name : "—") + "</td>" +
+      "<td>" + thumb + "</td>" +
+      "<td>" + tagsHtml + "</td>" +
+      '<td><span class="pill ' + statusClass + '">' + escHtml(statusText) + "</span></td>";
+
+    tbody.appendChild(row);
+  }
+
+  byId("count").textContent = "Encontrado: " + filtered.length;
+}
+
+// Fetch tolerante: NO revienta el listado si hay 500
+function fetchByStatus(status) {
+  var url = BASE + "/pet/findByStatus?status=" + encodeURIComponent(status);
+
+  return fetch(url, { headers: { "Accept": "application/json" } })
+    .then(function (res) {
+      return res.text().then(function (text) {
+        var body = null;
+        try { body = JSON.parse(text); } catch (e) { body = null; }
+
+        if (!res.ok) {
+          return { ok: false, status: status, http: res.status, url: url, data: [] };
+        }
+
+        return { ok: true, status: status, http: res.status, url: url, data: Array.isArray(body) ? body : [] };
+      });
+    });
+}
+
+function loadAllPets() {
+  var statuses = qsAll(".st:checked").map(function (c) { return c.value; });
+  var refreshBtn = byId("refreshBtn");
+  var errorBox = byId("error");
+
+  refreshBtn.disabled = true;
+  refreshBtn.textContent = "Cargando…";
+  errorBox.style.display = "none";
+  errorBox.textContent = "";
+
+  byId("tbody").innerHTML = '<tr><td colspan="6" class="muted">Cargando…</td></tr>';
+
+  if (!statuses.length) {
+    window._lastPets = [];
+    renderPets([]);
+    refreshBtn.disabled = false;
+    refreshBtn.textContent = "Actualizar lista";
+    return;
+  }
+
+  Promise.all(statuses.map(fetchByStatus))
+    .then(function (results) {
+      var okPets = [];
+      var failed = [];
+
+      for (var i = 0; i < results.length; i++) {
+        if (results[i].ok) okPets = okPets.concat(results[i].data);
+        else failed.push(results[i]);
+      }
+
+      var merged = dedupeById(okPets);
+      window._lastPets = merged;
+      renderPets(merged);
+
+      if (failed.length) {
+        errorBox.style.display = "block";
+        errorBox.textContent =
+          "⚠️ Algunas consultas fallaron, pero se muestran resultados parciales:\n" +
+          failed.map(function (f) { return "• " + f.status + ": HTTP " + f.http; }).join("\n");
+
+        // opcional: desmarcar sold si falla 500
+        var soldFailed = failed.some(function (f) { return f.status === "sold" && f.http === 500; });
+        if (soldFailed) {
+          var soldChk = qsAll(".st").find(function (x) { return x.value === "sold"; });
+          if (soldChk) soldChk.checked = false;
+        }
+      }
+    })
+    .catch(function (e) {
+      errorBox.textContent = String(e);
+      errorBox.style.display = "block";
+      window._lastPets = [];
+      renderPets([]);
+    })
+    .finally(function () {
+      refreshBtn.disabled = false;
+      refreshBtn.textContent = "Actualizar lista";
+    });
+}
+
+byId("refreshBtn").addEventListener("click", loadAllPets);
+qsAll(".st").forEach(function (c) { c.addEventListener("change", loadAllPets); });
+byId("qAll").addEventListener("input", function () { renderPets(window._lastPets); });
+
+loadAllPets();
+</script>
+</body>
+</html>

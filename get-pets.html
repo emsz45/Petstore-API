@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Búsqueda de Mascotas</title>
+  <link rel="icon" type="image/x-icon" href="pets.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      color-scheme: light;
+      --bg: #f7efe5;
+      --bg-card: #ffffff;
+      --bg-header: #e6d7c3;
+      --text: #5a4632;
+      --text-muted: #7d6a53;
+      --brand: #b99672;
+      --brand-dark: #5a4632;
+      --border: #e5e7eb;
+      --thead-bg: #faf5ef;
+
+      --success-bg: #e6f6ec;
+      --success-fg: #0a7d34;
+      --warn-bg: #fff7e6;
+      --warn-fg: #a15c00;
+      --danger-bg: #fdecec;
+      --danger-fg: #a10d11;
+
+      --chip-bg: #efe7de;
+      --chip-fg: var(--text);
+      --card-muted: #f4eee7;
+    }
+
+    *{ box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin: 0;
+      font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+
+      background-image: url("https://www.shutterstock.com/image-vector/dog-paw-bone-seamless-vector-600nw-2465714911.jpg");
+      background-repeat: repeat;
+      background-size: auto;
+      background-position: top left;
+    }
+
+    /* Header */
+    .header{
+      position: sticky; top: 0; z-index: 10;
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      backdrop-filter: saturate(180%) blur(6px);
+    }
+
+    .nav{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: .9rem 1rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: .75rem;
+      align-items: center;
+    }
+    @media (min-width: 860px){
+      .nav{ grid-template-columns: 1fr auto; }
+    }
+
+    /* Brand: texto + icono alineados */
+    .brand{
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      min-width: 0;
+    }
+    .brand a{
+      text-decoration: none;
+      color: var(--brand-dark);
+      font-weight: 700;
+      letter-spacing: .3px;
+      font-size: 1.15rem;
+      white-space: nowrap;
+    }
+    .brand a:hover{ text-decoration: underline; }
+    .brand img{
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    .links{ display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+
+    .nav a, .nav button{
+      appearance: none;
+      border: 0;
+      text-decoration: none;
+      cursor: pointer;
+      padding: .55rem .8rem;
+      border-radius: .6rem;
+      font-weight: 600;
+      box-shadow: 0 1px 0 rgba(0,0,0,.03);
+      transition: transform .12s ease, box-shadow .2s ease, background .2s ease, color .2s ease, opacity .2s ease;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+    .nav a:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(0,0,0,.08);
+    }
+
+    /* ✅ Botón único azul Acciones */
+    .acciones{
+      background: #0d6efd;
+      color: #fff;
+      border-color: transparent;
+    }
+    .acciones:hover{ opacity: .95; }
+
+    /* Layout principal */
+    main{ padding: 1.25rem; }
+    @media (min-width: 860px){ main{ padding: 2rem; } }
+
+    .card{
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.06);
+      padding: 1.25rem;
+    }
+    @media (min-width: 860px){ .card{ padding: 1.5rem; } }
+
+    h1{ margin: 0 0 .35rem; font-size: 1.6rem; }
+    @media (min-width: 600px){ h1{ font-size: 1.85rem; } }
+    .help{ color: var(--text-muted); margin: .25rem 0 1rem; }
+
+    /* Formularios */
+    fieldset{
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      background: #fff;
+    }
+    legend{ font-weight: 700; padding: 0 .4rem; color: var(--brand-dark); }
+    label{ display: block; font-weight: 600; margin-bottom: .35rem; }
+
+    input, select{
+      width: 100%;
+      padding: .6rem .65rem;
+      border: 1px solid var(--border);
+      border-radius: .6rem;
+      background: #fff;
+      color: var(--text);
+      transition: box-shadow .15s ease, border-color .15s ease;
+      outline: none;
+    }
+    input:focus, select:focus{
+      border-color: #d8c6b1;
+      box-shadow: 0 0 0 3px rgba(185,150,114,.25);
+    }
+    input::placeholder{ color: #9b8f83; }
+
+    .row{ display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    @media (min-width: 740px){ .row{ grid-template-columns: 1fr 1fr; } }
+
+    .actions{ display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
+
+    button{
+      padding: .65rem 1rem;
+      border: 0;
+      border-radius: .6rem;
+      background: var(--brand);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(185,150,114,.25);
+      transition: transform .12s ease, box-shadow .2s ease, background .2s ease;
+    }
+    button:hover{ transform: translateY(-1px); box-shadow: 0 8px 18px rgba(185,150,114,.32); }
+    button:disabled{ opacity: .6; cursor: not-allowed; transform: none; box-shadow: none; }
+    button.secondary{ background: #6aa686; }
+    button.ghost{ background: transparent; color: var(--brand-dark); border: 1px solid #d8c6b1; }
+
+    .grid{ display: grid; gap: 1.25rem; }
+
+    /* Result Bar */
+    .bar{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .75rem;
+      border: 1px solid var(--border);
+      background: var(--card-muted);
+      border-radius: 12px;
+      padding: .65rem .8rem;
+    }
+    .bar .left{ display: flex; align-items: center; gap: .75rem; }
+    .http-ok{ color: var(--success-fg); font-weight: 700; }
+    .http-err{ color: var(--danger-fg); font-weight: 700; }
+    .count{ color: var(--brand-dark); font-weight: 700; }
+    .note{ font-size: .9rem; color: var(--text-muted); }
+
+    /* Cards de resultados */
+    .cards{ display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); }
+    .card-item{
+      border: 1px solid var(--border);
+      border-radius: .9rem;
+      overflow: hidden;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 12px rgba(0,0,0,.04);
+    }
+    .thumb-wrap{ position: relative; background: #f1f3f6; }
+    .thumb{ width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+    .thumb.placeholder{ display: flex; align-items: center; justify-content: center; color: #8c7f73; font-size: .95rem; background: #f4eee7; }
+
+    .badge-status{
+      display: inline-block;
+      font-size: .8rem;
+      font-weight: 700;
+      padding: .15rem .45rem;
+      border-radius: .6rem;
+      color: #fff;
+    }
+    .s-available{ background: var(--success-fg); }
+    .s-pending{ background: var(--warn-fg); }
+    .s-sold{ background: var(--danger-fg); }
+
+    .body{ padding: .85rem .95rem; display: flex; flex-direction: column; gap: .6rem; }
+    .title{ display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; }
+    .name{ font-weight: 700; font-size: 1.06rem; word-break: break-word; }
+    .kv{ display: grid; grid-template-columns: 92px 1fr; gap: .25rem .6rem; font-size: .95rem; }
+    .k{ color: var(--text-muted); }
+    .chips{ display: flex; gap: .35rem; flex-wrap: wrap; }
+    .chip{
+      background: var(--chip-bg);
+      color: var(--chip-fg);
+      border: 1px solid #dfd2c3;
+      padding: .12rem .5rem;
+      border-radius: .6rem;
+      font-size: .82rem;
+    }
+    .card-actions{ display: flex; gap: .5rem; margin-top: .2rem; }
+
+    /* Modal */
+    .modal{
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 20;
+    }
+    .modal.open{ display: flex; }
+    .modal-box{
+      background: #fff;
+      border-radius: 14px;
+      width: min(960px, 95vw);
+      max-height: 90vh;
+      overflow: auto;
+      box-shadow: 0 8px 30px rgba(0,0,0,.2);
+      border: 1px solid var(--border);
+    }
+    .modal-head{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .8rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-body{ padding: 0; }
+    .modal-body img{ display: block; width: 100%; height: auto; object-fit: contain; }
+    .modal-body pre{ margin: 0; padding: 1rem; background: #151212; color: #efeae4; border-radius: 0; overflow: auto; }
+    .close-x{ background: transparent; border: 0; font-size: 1.2rem; cursor: pointer; color: var(--brand-dark); }
+
+    /* Footer */
+    footer.site{
+      max-width: 1200px;
+      margin: 1.25rem auto 0;
+      background: var(--bg-header);
+      color: var(--text);
+      border-top: 1px solid var(--border);
+      border-radius: 12px;
+      padding: .9rem 1rem;
+      text-align: center;
+    }
+    footer small{ opacity: .85; }
+  </style>
+</head>
+
+<body>
+  <header class="header" role="banner">
+    <nav class="nav" aria-label="Navegación principal">
+      <div class="brand">
+        <a href="main-index.html">Tienda de Mascotas</a>
+        <img src="icon.png" alt="Icono tienda">
+      </div>
+
+      <!-- ✅ SOLO UN BOTÓN -->
+      <div class="links">
+        <a class="acciones" href="./acciones.html">Acciones</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="card">
+      <h1>Buscar mascotas</h1>
+
+      <div class="grid">
+        <!-- GET by Name -->
+        <form id="byNameForm">
+          <fieldset>
+            <legend>Por nombre</legend>
+            <div class="row">
+              <div>
+                <label for="petName">Nombre *</label>
+                <input id="petName" name="petName" type="text" required placeholder="ej. doggie" />
+              </div>
+              <div>
+                <label for="limitName">Límite (opcional)</label>
+                <input id="limitName" type="number" min="1" placeholder="ej. 12">
+              </div>
+            </div>
+            <div class="actions">
+              <button id="byNameBtn" type="submit">Buscar por nombre</button>
+              <span id="byNameInfo" class="note" aria-live="polite"></span>
+            </div>
+          </fieldset>
+        </form>
+
+        <!-- GET by ID -->
+        <form id="byIdForm">
+          <fieldset>
+            <legend>Por ID</legend>
+            <div class="row">
+              <div>
+                <label for="petId">Identificador de Mascota *</label>
+                <input id="petId" name="petId" type="number" min="1" required placeholder="ej. 1" />
+              </div>
+            </div>
+            <div class="actions">
+              <button id="byIdBtn" type="submit" class="secondary">Buscar por ID</button>
+              <span id="byIdInfo" class="note" aria-live="polite"></span>
+            </div>
+          </fieldset>
+        </form>
+
+        <!-- GET by Status -->
+        <form id="byStatusForm">
+          <fieldset>
+            <legend>Por estado</legend>
+            <div class="row">
+              <div>
+                <label for="status">Estado *</label>
+                <select id="status" name="status" required>
+                  <option value="available">available</option>
+                  <option value="pending">pending</option>
+                  <option value="sold">sold</option>
+                </select>
+              </div>
+              <div>
+                <label for="limitStatus">Límite (opcional)</label>
+                <input id="limitStatus" name="limitStatus" type="number" min="1" placeholder="ej. 12" />
+              </div>
+            </div>
+            <div class="actions">
+              <button id="byStatusBtn" type="submit">Buscar por estado</button>
+              <span id="byStatusInfo" class="note" aria-live="polite"></span>
+            </div>
+          </fieldset>
+        </form>
+
+        <!-- GET by Tags -->
+        <form id="byTagsForm">
+          <fieldset>
+            <legend>Por etiquetas</legend>
+            <div class="row">
+              <div>
+                <label for="tags">Etiquetas (separadas por coma) *</label>
+                <input id="tags" name="tags" type="text" required placeholder="ej. friendly,adorable" />
+              </div>
+              <div>
+                <label for="limitTags">Límite (opcional)</label>
+                <input id="limitTags" name="limitTags" type="number" min="1" placeholder="ej. 12" />
+              </div>
+            </div>
+            <div class="actions">
+              <button id="byTagsBtn" type="submit" class="secondary">Buscar por tags</button>
+              <span id="byTagsInfo" class="note" aria-live="polite"></span>
+            </div>
+          </fieldset>
+        </form>
+
+        <!-- Result bar -->
+        <section>
+          <div class="bar" aria-live="polite">
+            <div class="left">
+              <span id="httpStatus"></span>
+              <span id="count" class="count"></span>
+            </div>
+            <div class="right">
+              <span id="lastUrl" class="note"></span>
+            </div>
+          </div>
+          <div id="cards" class="cards" style="margin-top:1rem"></div>
+        </section>
+      </div>
+    </div>
+
+    <footer class="site">
+      <small>© 2026 Tienda de Mascotas. Todos los derechos reservados.</small>
+    </footer>
+  </main>
+
+  <!-- Modal -->
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-label="Detalle">
+    <div class="modal-box">
+      <div class="modal-head">
+        <strong id="modalTitle">Detalle</strong>
+        <button id="modalClose" class="close-x" aria-label="Cerrar">✕</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+<script>
+  // ================== Helpers básicos ==================
+  const $ = (id) => document.getElementById(id);
+
+  const httpStatusEl = $("httpStatus");
+  const countEl = $("count");
+  const lastUrlEl = $("lastUrl");
+  const cardsEl = $("cards");
+  const modal = $("modal");
+  const modalTitle = $("modalTitle");
+  const modalBody = $("modalBody");
+
+  const state = { data: [] };
+  const API = "https://petstore3.swagger.io/api/v3";
+
+  // ================== UI helpers (sin innerHTML peligroso) ==================
+  function clear(el){ while(el.firstChild) el.removeChild(el.firstChild); }
+
+  function setHttp(ok, status){
+    clear(httpStatusEl);
+    const sp = document.createElement("span");
+    sp.className = ok ? "http-ok" : "http-err";
+    sp.textContent = `HTTP ${status}`;
+    httpStatusEl.appendChild(sp);
+  }
+
+  function setCount(n){
+    countEl.textContent = n ? `Encontrado: ${n}` : "";
+  }
+
+  function setLastUrl(url){
+    lastUrlEl.textContent = url || "";
+  }
+
+  function firstPhoto(pet){
+    const arr = Array.isArray(pet && pet.photoUrls) ? pet.photoUrls : [];
+    for (const u of arr){
+      if (typeof u === "string" && u.trim().length) return u;
+    }
+    return "";
+  }
+
+  function statusClass(s){
+    if (s === "available") return "s-available";
+    if (s === "pending") return "s-pending";
+    if (s === "sold") return "s-sold";
+    return "";
+  }
+
+  // ================== Modal ==================
+  function openModalWithImage(src, title){
+    modalTitle.textContent = title || "Foto";
+    clear(modalBody);
+
+    if (!src){
+      const div = document.createElement("div");
+      div.style.padding = "1rem";
+      div.textContent = "Sin imagen";
+      modalBody.appendChild(div);
+    } else {
+      const img = document.createElement("img");
+      img.src = src;
+      img.alt = title || "Foto";
+      modalBody.appendChild(img);
+    }
+
+    modal.classList.add("open");
+  }
+
+  function openModalWithJson(obj, title){
+    modalTitle.textContent = title || "JSON";
+    clear(modalBody);
+
+    const pre = document.createElement("pre");
+    pre.textContent = JSON.stringify(obj || {}, null, 2);
+    modalBody.appendChild(pre);
+
+    modal.classList.add("open");
+  }
+
+  function closeModal(){
+    modal.classList.remove("open");
+    clear(modalBody);
+  }
+
+  $("modalClose").addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+  // ================== Render tarjetas (DOM puro, cero plantillas) ==================
+  function renderCards(list){
+    clear(cardsEl);
+
+    if (!Array.isArray(list) || list.length === 0){
+      const p = document.createElement("p");
+      p.className = "help";
+      p.textContent = "Sin resultados para mostrar.";
+      cardsEl.appendChild(p);
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+
+    for (const p of list){
+      const article = document.createElement("article");
+      article.className = "card-item";
+
+      // Thumb
+      const thumbWrap = document.createElement("div");
+      thumbWrap.className = "thumb-wrap";
+
+      const imgUrl = firstPhoto(p);
+      if (imgUrl){
+        const img = document.createElement("img");
+        img.className = "thumb";
+        img.src = imgUrl;
+        img.alt = (p && p.name) ? p.name : "Foto";
+        thumbWrap.appendChild(img);
+      } else {
+        const ph = document.createElement("div");
+        ph.className = "thumb placeholder";
+        ph.textContent = "Sin imagen";
+        thumbWrap.appendChild(ph);
+      }
+
+      article.appendChild(thumbWrap);
+
+      // Body
+      const body = document.createElement("div");
+      body.className = "body";
+
+      const title = document.createElement("div");
+      title.className = "title";
+
+      const name = document.createElement("div");
+      name.className = "name";
+      name.textContent = (p && p.name) ? p.name : "(sin nombre)";
+      title.appendChild(name);
+
+      if (p && p.status){
+        const badge = document.createElement("span");
+        badge.className = `badge-status ${statusClass(p.status)}`;
+        badge.textContent = p.status;
+        title.appendChild(badge);
+      }
+
+      body.appendChild(title);
+
+      // KV
+      const kv = document.createElement("div");
+      kv.className = "kv";
+
+      function addKv(k, v){
+        const dk = document.createElement("div");
+        dk.className = "k";
+        dk.textContent = k;
+
+        const dv = document.createElement("div");
+        dv.textContent = v;
+
+        kv.appendChild(dk);
+        kv.appendChild(dv);
+      }
+
+      const idVal = (p && p.id != null) ? String(p.id) : "";
+      addKv("ID", idVal ? `#${idVal}` : "—");
+
+      const catName = (p && p.category && p.category.name) ? p.category.name : "";
+      const catId = (p && p.category && p.category.id != null) ? ` (id: ${p.category.id})` : "";
+      addKv("Categoría", (catName || "—") + catId);
+
+      const photosCount = (p && Array.isArray(p.photoUrls)) ? p.photoUrls.length : 0;
+      addKv("# Fotos", String(photosCount));
+
+      body.appendChild(kv);
+
+      // Chips tags
+      const chips = document.createElement("div");
+      chips.className = "chips";
+
+      if (p && Array.isArray(p.tags) && p.tags.length){
+        for (const t of p.tags){
+          const chip = document.createElement("span");
+          chip.className = "chip";
+          const tName = (t && t.name) ? t.name : "";
+          const tId = (t && t.id != null) ? ` (#${t.id})` : "";
+          chip.textContent = `${tName}${tId}`.trim() || "tag";
+          chips.appendChild(chip);
+        }
+      }
+
+      body.appendChild(chips);
+
+      // Actions
+      const actions = document.createElement("div");
+      actions.className = "card-actions";
+
+      if (imgUrl){
+        const bPhoto = document.createElement("button");
+        bPhoto.type = "button";
+        bPhoto.className = "ghost";
+        bPhoto.dataset.action = "photo";
+        bPhoto.dataset.src = imgUrl;
+        bPhoto.dataset.title = (p && p.name) ? p.name : "Foto";
+        bPhoto.textContent = "Foto";
+        actions.appendChild(bPhoto);
+      }
+
+      const bJson = document.createElement("button");
+      bJson.type = "button";
+      bJson.className = "secondary";
+      bJson.dataset.action = "json";
+      bJson.dataset.id = idVal;
+      bJson.textContent = "JSON";
+      actions.appendChild(bJson);
+
+      body.appendChild(actions);
+
+      article.appendChild(body);
+      frag.appendChild(article);
+    }
+
+    cardsEl.appendChild(frag);
+  }
+
+  // Delegación de eventos en tarjetas
+  cardsEl.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-action]");
+    if (!btn) return;
+
+    const action = btn.dataset.action;
+
+    if (action === "photo"){
+      openModalWithImage(btn.dataset.src, btn.dataset.title || "Foto");
+      return;
+    }
+
+    if (action === "json"){
+      const id = btn.dataset.id;
+      const item = state.data.find(x => String(x && x.id) === String(id));
+      openModalWithJson(item || {}, `Mascota #${id}`);
+      return;
+    }
+  });
+
+  // ================== Fetch helpers ==================
+  async function fetchJson(url){
+    const res = await fetch(url, { method: "GET" });
+    let body = null;
+    try { body = await res.json(); } catch { body = null; }
+    return { res, body };
+  }
+
+  // ================== Formularios ==================
+
+  // Por ID
+  $("byIdForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const idVal = Number($("petId").value);
+    if (!Number.isFinite(idVal) || idVal <= 0){
+      setHttp(false, "—");
+      setCount(0);
+      setLastUrl("");
+      renderCards([]);
+      return;
+    }
+
+    const url = `${API}/pet/${encodeURIComponent(idVal)}`;
+    $("byIdBtn").disabled = true;
+    $("byIdBtn").textContent = "Buscando…";
+    $("byIdInfo").textContent = url;
+    setLastUrl(url);
+
+    try{
+      const { res, body } = await fetchJson(url);
+      setHttp(res.ok, res.status);
+
+      if (res.ok && body && typeof body === "object" && !Array.isArray(body)){
+        state.data = [body];
+        setCount(1);
+        renderCards(state.data);
+      } else {
+        state.data = [];
+        setCount(0);
+        renderCards([]);
+      }
+    }catch(err){
+      setHttp(false, "error");
+      setCount(0);
+      clear(cardsEl);
+      const p = document.createElement("p");
+      p.className = "help";
+      p.textContent = `Falló la solicitud: ${String(err)}`;
+      cardsEl.appendChild(p);
+    }finally{
+      $("byIdBtn").disabled = false;
+      $("byIdBtn").textContent = "Buscar por ID";
+      $("byIdInfo").textContent = "";
+    }
+  });
+
+  // Por estado
+  $("byStatusForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const status = $("status").value;
+    const limit = Number($("limitStatus").value);
+    const url = `${API}/pet/findByStatus?status=${encodeURIComponent(status)}`;
+
+    $("byStatusBtn").disabled = true;
+    $("byStatusBtn").textContent = "Buscando…";
+    $("byStatusInfo").textContent = url;
+    setLastUrl(url);
+
+    try{
+      const { res, body } = await fetchJson(url);
+      setHttp(res.ok, res.status);
+
+      if (res.ok && Array.isArray(body)){
+        state.data = body;
+        const view = (Number.isFinite(limit) && limit > 0) ? body.slice(0, limit) : body;
+        setCount(view.length);
+        renderCards(view);
+      } else {
+        state.data = [];
+        setCount(0);
+        renderCards([]);
+      }
+    }catch(err){
+      setHttp(false, "error");
+      setCount(0);
+      clear(cardsEl);
+      const p = document.createElement("p");
+      p.className = "help";
+      p.textContent = `Falló la solicitud: ${String(err)}`;
+      cardsEl.appendChild(p);
+    }finally{
+      $("byStatusBtn").disabled = false;
+      $("byStatusBtn").textContent = "Buscar por estado";
+      $("byStatusInfo").textContent = "";
+    }
+  });
+
+  // Por tags
+  $("byTagsForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const raw = $("tags").value.trim();
+    if (!raw){
+      setHttp(false, "—");
+      setCount(0);
+      setLastUrl("");
+      renderCards([]);
+      return;
+    }
+
+    const tags = raw.split(",").map(s => s.trim()).filter(Boolean);
+    const q = tags.map(t => `tags=${encodeURIComponent(t)}`).join("&");
+    // NOTA: En el HTML real esto debe ser join("&") (si lo copias tal cual del chat, cambia "&" por "&")
+    const url = `${API}/pet/findByTags?${q}`;
+    const limit = Number($("limitTags").value);
+
+    $("byTagsBtn").disabled = true;
+    $("byTagsBtn").textContent = "Buscando…";
+    $("byTagsInfo").textContent = url;
+    setLastUrl(url);
+
+    try{
+      const { res, body } = await fetchJson(url);
+      setHttp(res.ok, res.status);
+
+      if (res.ok && Array.isArray(body)){
+        state.data = body;
+        const view = (Number.isFinite(limit) && limit > 0) ? body.slice(0, limit) : body;
+        setCount(view.length);
+        renderCards(view);
+      } else {
+        state.data = [];
+        setCount(0);
+        renderCards([]);
+      }
+    }catch(err){
+      setHttp(false, "error");
+      setCount(0);
+      clear(cardsEl);
+      const p = document.createElement("p");
+      p.className = "help";
+      p.textContent = `Falló la solicitud: ${String(err)}`;
+      cardsEl.appendChild(p);
+    }finally{
+      $("byTagsBtn").disabled = false;
+      $("byTagsBtn").textContent = "Buscar por tags";
+      $("byTagsInfo").textContent = "";
+    }
+  });
+
+  // Por nombre (cliente) - busca en los 3 estados y filtra
+  $("byNameForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = $("petName").value.trim().toLowerCase();
+    if (!name){
+      setHttp(false, "—");
+      setCount(0);
+      setLastUrl("");
+      renderCards([]);
+      return;
+    }
+
+    const limit = Number($("limitName").value);
+
+    const urlAvailable = `${API}/pet/findByStatus?status=available`;
+    const urlPending   = `${API}/pet/findByStatus?status=pending`;
+    const urlSold      = `${API}/pet/findByStatus?status=sold`;
+
+    $("byNameBtn").disabled = true;
+    $("byNameBtn").textContent = "Buscando…";
+    $("byNameInfo").textContent = "Filtrando resultados...";
+    setLastUrl("GET by status → (available, pending, sold)");
+
+    try{
+      const results = await Promise.all([
+        fetchJson(urlAvailable).then(x => Array.isArray(x.body) ? x.body : []),
+        fetchJson(urlPending).then(x => Array.isArray(x.body) ? x.body : []),
+        fetchJson(urlSold).then(x => Array.isArray(x.body) ? x.body : [])
+      ]);
+
+      const all = results.flat();
+      const filtered = all.filter(p => String(p && p.name ? p.name : "").toLowerCase().includes(name));
+      const finalData = (Number.isFinite(limit) && limit > 0) ? filtered.slice(0, limit) : filtered;
+
+      state.data = finalData;
+      setHttp(true, 200);
+      setCount(finalData.length);
+      renderCards(finalData);
+    }catch(err){
+      setHttp(false, "error");
+      setCount(0);
+      clear(cardsEl);
+      const p = document.createElement("p");
+      p.className = "help";
+      p.textContent = `Falló la búsqueda: ${String(err)}`;
+      cardsEl.appendChild(p);
+    }finally{
+      $("byNameBtn").disabled = false;
+      $("byNameBtn").textContent = "Buscar por nombre";
+      $("byNameInfo").textContent = "";
+    }
+  });
+</script>
+</body>
+</html>

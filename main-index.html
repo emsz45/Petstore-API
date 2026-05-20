@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Tienda de Mascotas</title>
+    <link rel="icon" type="image/x-icon" href="pets.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>          
+        body {
+            margin: 0;
+            font-family: "Poppins", sans-serif;
+            background: #f7efe5;
+            color: #5a4632;
+  background-image: url("https://www.shutterstock.com/image-vector/dog-paw-bone-seamless-vector-600nw-2465714911.jpg");
+  background-repeat: repeat;       /* 🔁 se repite */
+  background-size: auto;           /* mantiene el tamaño real */
+  background-position: top left;   /* empieza desde la esquina */
+
+        }
+
+        header {
+            background: #e6d7c3;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .card h2 {
+            margin-bottom: 10px;
+            color: #5a4632;
+        }
+
+        .card p {
+            color: #7d6a53;
+            font-size: 0.95rem;
+        }
+
+        .card a {
+            display: block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #b99672;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .card a:hover {
+            background: #5a4632;
+        }
+
+        footer {
+            margin-top: 60px;
+            padding: 20px;
+            text-align: center;
+            background: #e6d7c3;
+            color: #35281a;
+            font-size: 0.9rem;
+        }
+
+        footer small {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1 style="display:flex; align-items:center; justify-content:center; gap:10px;">
+
+      
+
+        <!-- TEXTO -->
+        Tienda de Mascotas
+          <!-- ICONO -->
+        <img src="icon.png" alt="Icono tienda" 
+             style="width:38px; height:38px; object-fit:contain;">
+    </h1>
+</header>
+    <div class="container">
+        <div class="menu">
+
+            
+<div class="card">
+    <h2 style="display:flex; align-items:center; justify-content:center; gap:10px;">
+        <img src="paw.png" alt="Paw icon" style="width:28px; height:28px; object-fit:contain;">
+        Ver Mascotas
+    </h2>
+    <p>Añade, modifica o elimina mascotas.</p>
+    <a href="index.html">Entrar</a>
+</div>
+
+
+       <div class="card">
+    <h2 style="display:flex; align-items:center; justify-content:center; gap:10px;">
+        <img src="box.png" alt="Pedidos" style="width:28px; height:28px; object-fit:contain;">
+        Gestionar Pedidos
+    </h2>
+    <p>Crea, consulta o elimina pedidos.</p>
+    <a href="inventario.html">Entrar</a>
+</div>
+
+        </div>
+    </div>
+
+    <footer>
+        <small>© 2026 Tienda de Mascotas creada por Eva Sánchez. Todos los derechos reservados.</small>
+    </footer>
+
+</body>
+</html>

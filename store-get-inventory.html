@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inventario — Tienda de Mascotas</title>
+
+  <style>
+    :root {
+      --bg: #f7efe5;
+      --bg-card: #ffffff;
+      --bg-header: #e6d7c3;
+      --text: #5a4632;
+      --text-muted: #7d6a53;
+      --brand: #b99672;
+      --brand-dark: #5a4632;
+      --border: #e5e7eb;
+    }
+    body { margin: 0; font-family: "Poppins", sans-serif; background: var(--bg); color: var(--text); }
+    header { background: var(--bg-header); padding: 1rem; text-align: center; font-size: 1.4rem; font-weight: 700; box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
+    main { max-width: 900px; margin: 2rem auto; padding: 1rem; }
+    .actions { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; justify-content:flex-start; }
+    button { background: var(--brand); color: white; padding: .7rem 1rem; border: none; border-radius: .6rem; cursor: pointer; font-weight: 600; box-shadow: 0 4px 10px rgba(185,150,114,.25); transition: .2s; }
+    button:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(185,150,114,.32); }
+    .cards { margin-top: 1.5rem; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; box-shadow: 0 5px 12px rgba(0,0,0,0.06); text-align: center; }
+    .card h3 { margin: 0 0 .5rem; font-size: 1.2rem; }
+    .value { font-size: 2rem; font-weight: 700; color: var(--brand-dark); }
+    #status { margin-top: 1rem; font-weight: 600; text-align: center; }
+    .ok { color: #0a7d34; }
+    .err { color: #a10d11; }
+    footer.site { margin-top: 3rem; padding: 1rem; text-align: center; background: var(--bg-header); border-top: 1px solid var(--border); }
+    a.back { display:inline-block; margin-bottom: .75rem; color: var(--brand-dark); text-decoration: none; border: 1px solid #d8c6b1; padding:.4rem .7rem; border-radius:.6rem; font-weight:600; }
+    a.back:hover{ background:#fff; box-shadow:0 4px 10px rgba(0,0,0,.06); }
+  </style>
+</head>
+<body>
+<header>Tienda de Mascotas — Inventario</header>
+<main>
+<a class="ghost" href="./main-index.html">← Inicio</a>
+  <div class="actions">
+    <button id="loadBtn">Cargar inventario</button>
+  </div>
+  <div id="status"></div>
+  <div class="cards" id="cards"></div>
+</main>
+<footer class="site">© 2026 Tienda de Mascotas. Todos los derechos reservados.</footer>
+
+<script>
+  const API_URL = "https://petstore3.swagger.io/api/v3/store/inventory";
+
+  const btn = document.getElementById("loadBtn");
+  const statusBox = document.getElementById("status");
+  const cardsBox = document.getElementById("cards");
+
+  btn.addEventListener("click", () => loadInventory({ withRetries: true }));
+
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  async function fetchWithRetries(url, { retries = 2, baseDelay = 700 } = {}) {
+    let lastError;
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      const cacheBuster = `_=${Date.now()}`;
+      const sep = url.includes("?") ? "&" : "?";
+      const fullUrl = `${url}${sep}${cacheBuster}`;
+      try {
+        const res = await fetch(fullUrl, {
+          method: "GET",
+          headers: { "Accept": "application/json", "Cache-Control": "no-cache", "Pragma": "no-cache" },
+          cache: "no-store",
+        });
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          throw new Error(`HTTP ${res.status}${text ? ` — ${text.slice(0,200)}` : ""}`);
+        }
+        return res.json();
+      } catch (err) {
+        lastError = err;
+        if (attempt === retries) break;
+        const delay = baseDelay * Math.pow(2, attempt);
+        statusBox.textContent = `Reintentando… (intento ${attempt + 2} de ${retries + 1})`;
+        await sleep(delay);
+      }
+    }
+    throw lastError;
+  }
+
+  async function loadInventory({ withRetries = true } = {}) {
+    statusBox.textContent = "Cargando inventario…";
+    statusBox.className = "";
+    cardsBox.innerHTML = "";
+
+    try {
+      const data = await fetchWithRetries(API_URL, { retries: 2, baseDelay: 700 });
+      renderCards(data);
+      statusBox.textContent = "Inventario actualizado ✔";
+      statusBox.className = "ok";
+    } catch (error) {
+      console.error(error);
+      statusBox.innerHTML = `Error al cargar inventario. <span style="opacity:.8">(${String(error.message || error)})</span>`;
+      statusBox.className = "err";
+
+      // --- Modo Mock opcional ---
+      // const mock = { available: 12, pending: 3, sold: 5, reserved: 1 };
+      // renderCards(mock);
+      // statusBox.innerHTML += " — Mostrando datos de ejemplo (mock).";
+    }
+  }
+
+  function renderCards(data) {
+    const entries = Object.entries(data || {});
+    if (entries.length === 0) {
+      cardsBox.innerHTML = `<p class="help">Sin datos para mostrar.</p>`;
+      return;
+    }
+    const order = ["available", "pending", "sold"];
+    entries.sort((a, b) => {
+      const ia = order.indexOf(a[0]); const ib = order.indexOf(b[0]);
+      return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+    });
+    cardsBox.innerHTML = entries
+      .map(([status, qty]) => {
+        const emoji =
+          status === "available" ? "🐶" :
+          status === "pending"   ? "⏳" :
+          status === "sold"      ? "🏁" : "📦";
+        return `
+          <div class="card">
+            <h3>${emoji} ${escapeHtml(status)}</h3>
+            <div class="value">${Number.isFinite(qty) ? qty : "-"}</div>
+          </div>
+        `;
+      })
+      .join("");
+  }
+
+  function escapeHtml(v) {
+    return String(v ?? "")
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;")
+      .replace(/'/g,"&#39;");
+  }
+
+  loadInventory({ withRetries: true });
+</script>
+</body>
+</html>
